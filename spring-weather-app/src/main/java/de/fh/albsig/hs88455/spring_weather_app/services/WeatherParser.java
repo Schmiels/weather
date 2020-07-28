@@ -25,20 +25,15 @@ import de.fh.albsig.hs88455.spring_weather_app.models.Weather;
  *
  */
 public class WeatherParser {
-	
+		
 	/**
 	 *  WeatherParser class constructor
 	 */
 	public WeatherParser() {
-		
+
 	}
 	
-	private JSONObject formatJSON(JSONObject weatherData) {
-		// TODO: Sven Bartos: Logging
-		Logger logger = LogManager.getLogger(WeatherParser.class);
-		
-		logger.info(weatherData);
-		
+	private JSONObject formatJSON(JSONObject weatherData) {		
 		JSONObject main = (JSONObject) weatherData.get("main");
 		JSONObject sys = (JSONObject) weatherData.get("sys");
 		JSONObject coord = (JSONObject) weatherData.get("coord");
@@ -46,8 +41,7 @@ public class WeatherParser {
 		JSONArray weatherArray = (JSONArray) weatherData.get("weather");
 		JSONObject weatherInformation = (JSONObject) weatherArray.get(0);
 		
-		// ternary operators are necessary because some attributes are not
-		//  set for each city 
+		// ternary operators are necessary because some attributes are not set for each city 
 		JSONObject obj = new JSONObject()
 				.put("cityId", weatherData.get("id"))
 				.put("cityName", weatherData.get("name"))
@@ -68,8 +62,6 @@ public class WeatherParser {
 		JSONObject weather = new JSONObject()
 				.put("weather", obj);
 		
-		logger.info(weather);
-		
 		return weather;
 	}
 	
@@ -79,11 +71,10 @@ public class WeatherParser {
 	 * 
 	 * @param jsonObj | JSONObject
 	 * @return Weather-object
-	 * 
-	 * TODO: SvenBartos: einzelne Teile des Weather-Objektes in Methoden unterteilen (parseCoordFromJson()) sollte einfacher zu testen sein
 	 */
 	public Weather parseFromJSON(JSONObject jsonObj) {
-		// TODO: Error Handling
+		Logger logger = LogManager.getLogger(WeatherParser.class);
+		
 		Weather weather = new Weather();
 		
 		JAXBContext jaxbContext;
@@ -101,8 +92,7 @@ public class WeatherParser {
 
 			return (Weather) jaxbUnmarshaller.unmarshal(data);
 		} catch (JAXBException e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			logger.error(e.getStackTrace());
 		}
 		
 		return weather;
