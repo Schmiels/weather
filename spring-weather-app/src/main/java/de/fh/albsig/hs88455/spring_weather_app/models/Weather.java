@@ -14,6 +14,11 @@ import javax.xml.bind.Marshaller;
 
 import javax.xml.bind.annotation.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import de.fh.albsig.hs88455.spring_weather_app.controller.WeatherController;
+
 /**
  * Class for holding weather data and displaying it as xml
  * 
@@ -343,6 +348,8 @@ public class Weather implements Serializable {
 	 * @return | String value
 	 */
 	public String toXML() {
+		Logger logger = LogManager.getLogger(Weather.class);
+		
 		try {
 			StringWriter writer = new StringWriter();
 			
@@ -353,8 +360,7 @@ public class Weather implements Serializable {
 			
 			return writer.getBuffer().toString();
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getStackTrace());
 		}
 		
 		return "";
