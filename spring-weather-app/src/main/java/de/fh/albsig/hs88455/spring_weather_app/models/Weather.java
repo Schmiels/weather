@@ -1,5 +1,6 @@
 package de.fh.albsig.hs88455.spring_weather_app.models;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.Date;
 
@@ -15,6 +16,8 @@ import javax.xml.bind.annotation.*;
 
 /**
  * Class for holding weather data and displaying it as xml
+ * 
+ * TODO: Sven Bartos: sunset sunsire broken
  * 
  * @author Sven Bartos
  */
