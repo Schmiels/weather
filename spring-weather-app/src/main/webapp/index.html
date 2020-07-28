@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Getting Started: Serving Web Content</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<form action="/spring-weather-app/weather" method="post">
+		<p>Mindestens eins der unten aufgef&uuml;hrten Felder
+			ausf&uuml;llen.</p>
+		<p>
+			F&uuml;r die Suche per Stadtname: <label>*Hier Namen der
+				Stadt eingeben:</label> <input type="text" name="cityName"> <label>*Hier
+				Code des Landes (ISO 3166) eingeben:</label> <input type="text"
+				name="countryCode">
+
+		</p>
+		<p>
+			F&uuml;r die Suche per StadtID: <label>*Hier ID der Stadt
+				eingeben:</label> <input type="text" name="cityId">
+		</p>
+		<p>
+			F&uuml;r die Suche per Koordinaten: <label>*Hier Breitengrad
+				der Stadt eingeben:</label> <input type="text" name="lat"><label>*Hier
+				L&auml;ngengrad der Stadt eingeben:</label> <input type="text" name="lon">
+		</p>
+		<input type="submit">
+	</form>
+</body>
+</html>
