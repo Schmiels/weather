@@ -23,7 +23,9 @@ import javax.xml.bind.annotation.*;
  */
 @XmlRootElement(name="weather")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Weather {
+public class Weather implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 
 	@XmlElement(name="cityId")
 	private int cityId;
