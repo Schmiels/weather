@@ -2,7 +2,6 @@ package de.fh.albsig.hs88455.models;
 
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.Date;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -15,8 +14,6 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * Class for holding weather data and displaying it as xml.
- *
- * <p>TODO: Sven Bartos: sunset sunsire broken
  *
  * @author Sven Bartos
  */
@@ -31,79 +28,34 @@ public class Weather implements Serializable {
    */
   private static Logger logger = LogManager.getLogger(Weather.class);
 
-  /**
-   * A city's id.
-   */
   @XmlElement(name = "cityId")
   private int cityId;
-  /**
-   * Name of a city.
-   */
   @XmlElement(name = "cityName")
   private String cityName;
-  /**
-   * Country code of the country the city is located in.
-   */
   @XmlElement(name = "countryCode")
   private String countryCode;
-  /**
-   * Current weather description.
-   */
   @XmlElement(name = "weatherDesc")
   private String weatherDesc;
-  /**
-   * Current temperature.
-   */
   @XmlElement(name = "temp")
   private double temp;
-  /**
-   * Maximum temperature.
-   */
   @XmlElement(name = "tempMax")
   private double tempMax;
-  /**
-   * Minimum temperature.
-   */
   @XmlElement(name = "tempMin")
   private double tempMin;
-  /**
-   * Current humidity.
-   */
   @XmlElement(name = "humidity")
   private int humidity;
-  /**
-   * Current air pressure.
-   */
   @XmlElement(name = "pressure")
   private int pressure;
-  /**
-   * Sunrise time.
-   */
   @XmlElement(name = "sunrise")
-  private Date sunrise;
-  /**
-   * Sunset time.
-   */
+  private int sunrise;
   @XmlElement(name = "sunset")
-  private Date sunset;
-  /**
-   * Location's longitude.
-   */
+  private int sunset;
   @XmlElement(name = "lon")
   private double lon;
-  /**
-   * Location's latitude.
-   */
   @XmlElement(name = "lat")
   private double lat;
-  /**
-   * Current wind degree.
-   */
   @XmlElement(name = "windDeg")
   private int windDeg;
-  /**
-   * Current wind speed.
-   */
   @XmlElement(name = "windSpeed")
   private double windSpeed;
 
@@ -282,7 +234,7 @@ public class Weather implements Serializable {
    *
    * @return sunrise information about the queried city's sunrise time
    */
-  public Date getSunrise() {
+  public int getSunrise() {
     return sunrise;
   }
 
@@ -292,9 +244,7 @@ public class Weather implements Serializable {
    * @param sunRise Date
    */
   public void setSunrise(final int sunRise) {
-    logger.info("sunrise as in:" + Integer.toString(sunRise));
-    this.sunrise = new Date(sunRise);
-    logger.info("sunrise as date:" + this.sunrise);
+    this.sunrise = sunRise;
   }
 
   /**
@@ -302,7 +252,7 @@ public class Weather implements Serializable {
    *
    * @return sunset information about the queried city's sunset time
    */
-  public Date getSunset() {
+  public int getSunset() {
     return sunset;
   }
 
@@ -312,9 +262,7 @@ public class Weather implements Serializable {
    * @param sunSet Date
    */
   public void setSunset(final int sunSet) {
-    logger.info("sunset as in:" + Integer.toString(sunSet));
-    this.sunset = new Date(sunSet);
-    logger.info("sunset as date:" + this.sunset);
+    this.sunset = sunSet;
   }
 
   /**
@@ -393,8 +341,9 @@ public class Weather implements Serializable {
    * Parsing a weather object into a String that represents an xml document.
    *
    * @return String value
+   * @throws JAXBException Exception thrown during mashalling
    */
-  public String toXml() {
+  public String toXml() throws JAXBException {
     try {
       StringWriter writer = new StringWriter();
 
@@ -406,8 +355,7 @@ public class Weather implements Serializable {
       return writer.getBuffer().toString();
     } catch (JAXBException e) {
       logger.error(e.getMessage());
+      throw new JAXBException(e.getMessage());
     }
-
-    return "";
   }
 }
