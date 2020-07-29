@@ -405,7 +405,7 @@ public class Weather implements Serializable {
 
       return writer.getBuffer().toString();
     } catch (JAXBException e) {
-      logger.error(e.getStackTrace());
+      logger.error(e.getMessage());
     }
 
     return "";
