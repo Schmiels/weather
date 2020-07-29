@@ -1,13 +1,13 @@
 package de.fh.albsig.hs88455.exceptions;
 
-public class CustomException extends Exception {
+public class CustomOpenWeatherException extends Exception {
 
   /**
-   *
+   * CustomException class.
    */
   private static final long serialVersionUID = -2066321249005131954L;
 
-  public CustomException(String msg, Throwable err) {
+  public CustomOpenWeatherException(String msg, Throwable err) {
     super(msg, err);
   }
 }
