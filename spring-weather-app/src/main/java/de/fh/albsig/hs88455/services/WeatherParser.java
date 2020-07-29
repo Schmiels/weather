@@ -24,6 +24,8 @@ import org.json.JSONObject;
  */
 public class WeatherParser {
 
+  private static Logger logger = LogManager.getLogger(WeatherParser.class);
+
   /**
    * WeatherParser class constructor.
    */
@@ -38,6 +40,7 @@ public class WeatherParser {
    * @return JSONObject
    */
   private JSONObject formatJson(final JSONObject weatherData) {
+
     JSONObject main = (JSONObject) weatherData.get("main");
     JSONObject sys = (JSONObject) weatherData.get("sys");
     JSONObject coord = (JSONObject) weatherData.get("coord");
@@ -71,8 +74,6 @@ public class WeatherParser {
    * @return Weather-object
    */
   public Weather parseFromJson(JSONObject jsonObj) {
-    Logger logger = LogManager.getLogger(WeatherParser.class);
-
     Weather weather = new Weather();
 
     JAXBContext jaxbContext;
@@ -89,7 +90,7 @@ public class WeatherParser {
 
       return (Weather) jaxbUnmarshaller.unmarshal(data);
     } catch (JAXBException e) {
-      logger.error(e.getStackTrace());
+      logger.error(e.getMessage());
     }
 
     return weather;
