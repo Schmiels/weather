@@ -1,15 +1,17 @@
 package de.fh.albsig.hs88455.services;
 
+import de.fh.albsig.hs88455.exceptions.CustomException;
 import de.fh.albsig.hs88455.models.Weather;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 // import de.fh.albsig.hs88455.spring_weather_app.models.Weather;
@@ -17,13 +19,13 @@ import org.json.JSONObject;
 /**
  * Service for handling openweatherapi-calls.
  *
- * <p>TODO: Sven Bartos: Exception Handling fuer falschen Eingaben
- *
  * @author svenb
  */
 public class WeatherService {
 
   private final String apiKey = "0faf94f3aa783dbf3030947b5c36cf41";
+
+  private static Logger logger = LogManager.getLogger(WeatherService.class);
 
   /**
    * WeatherService class constructor.
@@ -35,15 +37,19 @@ public class WeatherService {
   /**
    * Getter method for returning the used api-key.
    *
-   * @return apiKey | String value
+   * @return apiKey String value
    */
   private String getApiKey() {
     return apiKey;
   }
 
-  // TODO: SvenBartos: implementieren verschiedener Methoden zur Abfrage der
-  // Wetterdaten
-
+  /**
+   * Building the URL for the API request.
+   *
+   * @param parameters url GET parameters
+   * @param types GET parameters' names
+   * @return String
+   */
   private String buildUrl(String[] parameters, String[] types) {
     URIBuilder builder = new URIBuilder();
     builder.setScheme("http");
@@ -61,7 +67,14 @@ public class WeatherService {
 
   }
 
-  private Weather requestWeatherData(String[] parameters, String[] types) {
+  /**
+   * Performing the API request.
+   *
+   * @param parameters url GET parameters
+   * @param types GET parameters' types
+   * @return weather object
+   */
+  private Weather requestWeatherData(String[] parameters, String[] types) throws CustomException {
     String respBody;
 
     CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -71,7 +84,12 @@ public class WeatherService {
 
       CloseableHttpResponse resp = httpClient.execute(get);
 
-      // TODO: Handle status codes
+      int statusCode = resp.getStatusLine().getStatusCode();
+      if (statusCode != 200) {
+        String errorMsg = "Error while performing API request: ";
+        logger.error(errorMsg + "{}", statusCode);
+        throw new CustomException(errorMsg + statusCode, null);
+      }
 
       respBody = EntityUtils.toString(resp.getEntity(), StandardCharsets.UTF_8);
 
@@ -83,15 +101,10 @@ public class WeatherService {
       Weather weather = weatherParser.parseFromJson(jsonObj);
 
       return weather;
-    } catch (ClientProtocolException e) {
-      // TODO: Exception Handling
-      System.out.println(e.toString());
     } catch (IOException e) {
-      // TODO: Exception Handling
-      System.out.println(e.toString());
+      logger.error(e.getMessage());
+      throw new CustomException("An Error accured while performing the API request", e);
     }
-
-    return new Weather();
   }
 
   /**
@@ -100,12 +113,17 @@ public class WeatherService {
    * @param cityName cityName
    * @param countryCode countryCode
    * @return weather object
+   * @throws CustomException
    */
-  public Weather getWeatherByCityName(String cityName, String countryCode) {
+  public Weather getWeatherByCityName(String cityName, String countryCode) throws CustomException {
     String[] parameters = {cityName.concat(",").concat(countryCode)};
     String[] types = {"q"};
 
-    return this.requestWeatherData(parameters, types);
+    try {
+      return this.requestWeatherData(parameters, types);
+    } catch (CustomException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
   }
 
   /**
@@ -113,12 +131,17 @@ public class WeatherService {
    *
    * @param cityId city's id
    * @return weather object
+   * @throws CustomException
    */
-  public Weather getWeatherByCityId(int cityId) {
+  public Weather getWeatherByCityId(int cityId) throws CustomException {
     String[] parameters = {Integer.toString(cityId)};
     String[] types = {"id"};
 
-    return this.requestWeatherData(parameters, types);
+    try {
+      return this.requestWeatherData(parameters, types);
+    } catch (CustomException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
   }
 
   /**
@@ -127,12 +150,16 @@ public class WeatherService {
    * @param lat latitude
    * @param lon longitude
    * @return weather object
+   * @throws CustomException
    */
-  public Weather getWeatherByCoords(double lat, double lon) {
+  public Weather getWeatherByCoords(double lat, double lon) throws CustomException {
     String[] parameters = {Double.toString(lat), Double.toString(lon)};
     String[] types = {"lat", "lon"};
 
-    return this.requestWeatherData(parameters, types);
-
+    try {
+      return this.requestWeatherData(parameters, types);
+    } catch (CustomException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
   }
 }
