@@ -1,6 +1,6 @@
 package de.fh.albsig.hs88455.services;
 
-import de.fh.albsig.hs88455.exceptions.CustomException;
+import de.fh.albsig.hs88455.exceptions.CustomOpenWeatherException;
 import de.fh.albsig.hs88455.models.Weather;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -70,11 +70,13 @@ public class WeatherService {
   /**
    * Performing the API request.
    *
-   * @param parameters url GET parameters
+   * @param parameters url GET Parameters
    * @param types GET parameters' types
    * @return weather object
+   * @throws CustomOpenWeatherException Exception being thrown on openweather-api calls
    */
-  private Weather requestWeatherData(String[] parameters, String[] types) throws CustomException {
+  private Weather requestWeatherData(String[] parameters, String[] types)
+      throws CustomOpenWeatherException {
     String respBody;
 
     CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -88,7 +90,7 @@ public class WeatherService {
       if (statusCode != 200) {
         String errorMsg = "Error while performing API request: ";
         logger.error(errorMsg + "{}", statusCode);
-        throw new CustomException(errorMsg + statusCode, null);
+        throw new CustomOpenWeatherException(errorMsg + statusCode, null);
       }
 
       respBody = EntityUtils.toString(resp.getEntity(), StandardCharsets.UTF_8);
@@ -103,7 +105,7 @@ public class WeatherService {
       return weather;
     } catch (IOException e) {
       logger.error(e.getMessage());
-      throw new CustomException("An Error accured while performing the API request", e);
+      throw new CustomOpenWeatherException("An Error accured while performing the API request", e);
     }
   }
 
@@ -113,16 +115,17 @@ public class WeatherService {
    * @param cityName cityName
    * @param countryCode countryCode
    * @return weather object
-   * @throws CustomException
+   * @throws CustomOpenWeatherException Exception being thrown on openweather-api calls
    */
-  public Weather getWeatherByCityName(String cityName, String countryCode) throws CustomException {
+  public Weather getWeatherByCityName(String cityName, String countryCode)
+      throws CustomOpenWeatherException {
     String[] parameters = {cityName.concat(",").concat(countryCode)};
     String[] types = {"q"};
 
     try {
       return this.requestWeatherData(parameters, types);
-    } catch (CustomException e) {
-      throw new CustomException(e.getMessage(), e);
+    } catch (CustomOpenWeatherException e) {
+      throw new CustomOpenWeatherException(e.getMessage(), e);
     }
   }
 
@@ -131,16 +134,16 @@ public class WeatherService {
    *
    * @param cityId city's id
    * @return weather object
-   * @throws CustomException
+   * @throws CustomOpenWeatherException Exception being thrown on openweather-api calls
    */
-  public Weather getWeatherByCityId(int cityId) throws CustomException {
+  public Weather getWeatherByCityId(int cityId) throws CustomOpenWeatherException {
     String[] parameters = {Integer.toString(cityId)};
     String[] types = {"id"};
 
     try {
       return this.requestWeatherData(parameters, types);
-    } catch (CustomException e) {
-      throw new CustomException(e.getMessage(), e);
+    } catch (CustomOpenWeatherException e) {
+      throw new CustomOpenWeatherException(e.getMessage(), e);
     }
   }
 
@@ -150,16 +153,16 @@ public class WeatherService {
    * @param lat latitude
    * @param lon longitude
    * @return weather object
-   * @throws CustomException
+   * @throws CustomOpenWeatherException Exception being thrown on openweather-api calls
    */
-  public Weather getWeatherByCoords(double lat, double lon) throws CustomException {
+  public Weather getWeatherByCoords(double lat, double lon) throws CustomOpenWeatherException {
     String[] parameters = {Double.toString(lat), Double.toString(lon)};
     String[] types = {"lat", "lon"};
 
     try {
       return this.requestWeatherData(parameters, types);
-    } catch (CustomException e) {
-      throw new CustomException(e.getMessage(), e);
+    } catch (CustomOpenWeatherException e) {
+      throw new CustomOpenWeatherException(e.getMessage(), e);
     }
   }
 }
