@@ -51,9 +51,12 @@ public class WeatherParser {
     // ternary operators are necessary because some attributes are not set
     // for each city
     JSONObject obj = new JSONObject().put("cityId", weatherData.get("id"))
-        .put("cityName", weatherData.get("name")).put("countryCode", sys.get("country"))
-        .put("weatherDesc", weatherInformation.get("description")).put("temp", main.get("temp"))
-        .put("tempMax", main.get("temp_max")).put("tempMin", main.get("temp_min"))
+        .put("cityName", weatherData.get("name"))
+        .put("countryCode", sys.get("country"))
+        .put("weatherDesc", weatherInformation.get("description"))
+        .put("temp", main.get("temp"))
+        .put("tempMax", main.get("temp_max"))
+        .put("tempMin", main.get("temp_min"))
         .put("tempMax", main.get("temp_max"))
         .put("pressure", main.has("pressure") ? main.get("pressure") : "")
         .put("sunrise", sys.has("sunrise") ? sys.get("sunrise") : "")
