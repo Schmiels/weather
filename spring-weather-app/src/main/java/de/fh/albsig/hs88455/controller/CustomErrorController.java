@@ -16,6 +16,12 @@ public class CustomErrorController implements ErrorController {
     return "/error";
   }
 
+  /**
+   * Handling internal errors.
+   *
+   * @param request request obeject
+   * @return
+   */
   @RequestMapping(value = "error")
   @ResponseBody
   public String error(HttpServletRequest request) {
@@ -26,8 +32,8 @@ public class CustomErrorController implements ErrorController {
     logger.error("An error has accured while performing the request.");
 
     return String.format(
-        "<html><body><h2>An error has accured while performing your request.</h2><div>Status code: <b>%s</b></div>"
-            + "<div>Exception Message: <b>%s</b></div><body></html>",
+        "<html><body><h2>An error has accured while performing your request.</h2>"
+        + "<div>Status code: <b>%s</b></div><div>Exception Message: <b>%s</b></div><body></html>",
         statusCode, exception == null ? "N/A" : exception.getMessage());
   }
 
