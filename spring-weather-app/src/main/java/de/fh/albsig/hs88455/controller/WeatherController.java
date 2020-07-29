@@ -1,8 +1,9 @@
 package de.fh.albsig.hs88455.controller;
 
-import de.fh.albsig.hs88455.exceptions.CustomException;
+import de.fh.albsig.hs88455.exceptions.CustomOpenWeatherException;
 import de.fh.albsig.hs88455.models.Weather;
 import de.fh.albsig.hs88455.services.WeatherService;
+import javax.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ public class WeatherController {
 
   /**
    * Processing POST from index form.
+   *
    * <p>Retrieve weather data with a POST request
    *
    * @param cityId cityId
@@ -60,8 +62,11 @@ public class WeatherController {
         return "The given input could not be used to request weather data.";
       }
       return weather.toXml();
-    } catch (CustomException e) {
+    } catch (CustomOpenWeatherException e) {
       logger.error("Failed during processing request with given parameters");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    } catch (JAXBException e) {
+      logger.error("Failed during marshalling the weather object.");
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
     }
   }
@@ -79,8 +84,11 @@ public class WeatherController {
     try {
       Weather weather = weatherService.getWeatherByCityId(cityId);
       return weather.toXml();
-    } catch (CustomException e) {
+    } catch (CustomOpenWeatherException e) {
       logger.error("Failed during processing request with given parameters");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    } catch (JAXBException e) {
+      logger.error("Failed during marshalling the weather object.");
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
     }
   }
@@ -100,8 +108,11 @@ public class WeatherController {
     try {
       Weather weather = weatherService.getWeatherByCityName(cityName, countryCode);
       return weather.toXml();
-    } catch (CustomException e) {
+    } catch (CustomOpenWeatherException e) {
       logger.error("Failed during processing request with given parameters");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    } catch (JAXBException e) {
+      logger.error("Failed during marshalling the weather object.");
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
     }
   }
@@ -109,7 +120,7 @@ public class WeatherController {
   /**
    * REST endpoint for the coordinates.
    *
-   * @param lat  latidute
+   * @param lat latidute
    * @param lon longitude
    * @return String
    */
@@ -121,8 +132,11 @@ public class WeatherController {
     try {
       Weather weather = weatherService.getWeatherByCoords(lat, lon);
       return weather.toXml();
-    } catch (CustomException e) {
+    } catch (CustomOpenWeatherException e) {
       logger.error("Failed during processing request with given parameters");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    } catch (JAXBException e) {
+      logger.error("Failed during marshalling the weather object.");
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
     }
   }
