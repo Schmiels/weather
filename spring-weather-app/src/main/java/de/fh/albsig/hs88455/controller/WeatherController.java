@@ -43,7 +43,7 @@ public class WeatherController {
    * @param lat latitude
    * @param lon longitude
    * @param countryCodeForName countryCode for the cityName
-   * @param countryCodeForZIP countryCode for the zip
+   * @param countryCodeForZip countryCode for the zip
    * @return String
    */
   @PostMapping("/weather")
