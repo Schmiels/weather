@@ -32,7 +32,7 @@ Das Formular ist unter (https://localhost:8080) zu finden.
 - /weather/lat/{lat}/lon/{lon}
   - lat: Breitengrad der Position
   - lon: Längengrad der Position
-  - /weather/lat/52,27/lon10.53
+  - /weather/lat/52.27/lon/10.53
 - /weather/zipcode/{zipCode}/country/{countryCode}
   - zipcode: Postleizahl der Position
   - countryCode: Ländercode des Landes entsprechend ISO 3166
