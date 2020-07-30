@@ -14,6 +14,7 @@ import org.eclipse.persistence.jaxb.JAXBContextFactory;
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 import org.eclipse.persistence.jaxb.xmlmodel.ObjectFactory;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -38,35 +39,40 @@ public class WeatherParser {
    *
    * @param weatherData data received from API
    * @return JSONObject
+   * @throws JSONException Exception thrown while formatting JSON
    */
-  private JSONObject formatJson(final JSONObject weatherData) {
+  private JSONObject formatJson(final JSONObject weatherData) throws JSONException {
+    try {
+      JSONObject main = (JSONObject) weatherData.get("main");
+      JSONObject sys = (JSONObject) weatherData.get("sys");
+      JSONObject coord = (JSONObject) weatherData.get("coord");
+      JSONObject wind = (JSONObject) weatherData.get("wind");
+      JSONArray weatherArray = (JSONArray) weatherData.get("weather");
+      JSONObject weatherInformation = (JSONObject) weatherArray.get(0);
 
-    JSONObject main = (JSONObject) weatherData.get("main");
-    JSONObject sys = (JSONObject) weatherData.get("sys");
-    JSONObject coord = (JSONObject) weatherData.get("coord");
-    JSONObject wind = (JSONObject) weatherData.get("wind");
-    JSONArray weatherArray = (JSONArray) weatherData.get("weather");
-    JSONObject weatherInformation = (JSONObject) weatherArray.get(0);
+      // ternary operators are necessary because some attributes are not set
+      // for each city
+      JSONObject obj = new JSONObject().put("cityId", weatherData.get("id"))
+          .put("cityName", weatherData.get("name"))
+          .put("countryCode", sys.get("country"))
+          .put("weatherDesc", weatherInformation.get("description"))
+          .put("temp", main.get("temp"))
+          .put("tempMax", main.get("temp_max"))
+          .put("tempMin", main.get("temp_min"))
+          .put("tempMax", main.get("temp_max"))
+          .put("pressure", main.has("pressure") ? main.get("pressure") : "")
+          .put("sunrise", sys.has("sunrise") ? sys.get("sunrise") : "")
+          .put("sunset", sys.has("sunset") ? sys.get("sunset") : "").put("lon", coord.get("lon"))
+          .put("lat", coord.get("lat")).put("windDeg", wind.has("deg") ? wind.get("deg") : "")
+          .put("windSpeed", wind.has("speed") ? wind.get("speed") : "");
 
-    // ternary operators are necessary because some attributes are not set
-    // for each city
-    JSONObject obj = new JSONObject().put("cityId", weatherData.get("id"))
-        .put("cityName", weatherData.get("name"))
-        .put("countryCode", sys.get("country"))
-        .put("weatherDesc", weatherInformation.get("description"))
-        .put("temp", main.get("temp"))
-        .put("tempMax", main.get("temp_max"))
-        .put("tempMin", main.get("temp_min"))
-        .put("tempMax", main.get("temp_max"))
-        .put("pressure", main.has("pressure") ? main.get("pressure") : "")
-        .put("sunrise", sys.has("sunrise") ? sys.get("sunrise") : "")
-        .put("sunset", sys.has("sunset") ? sys.get("sunset") : "").put("lon", coord.get("lon"))
-        .put("lat", coord.get("lat")).put("windDeg", wind.has("deg") ? wind.get("deg") : "")
-        .put("windSpeed", wind.has("speed") ? wind.get("speed") : "");
+      JSONObject weather = new JSONObject().put("weather", obj);
 
-    JSONObject weather = new JSONObject().put("weather", obj);
-
-    return weather;
+      return weather;
+    } catch (JSONException e) {
+      logger.error(e.getMessage());
+      throw new JSONException(e.getMessage());
+    }
   }
 
   /**
@@ -75,8 +81,9 @@ public class WeatherParser {
    *
    * @param jsonObj | JSONObject
    * @return Weather-object
+   * @throws JSONException Exception thrown while formatting JSON
    */
-  public Weather parseFromJson(JSONObject jsonObj) {
+  public Weather parseFromJson(JSONObject jsonObj) throws JSONException {
     Weather weather = new Weather();
 
     JAXBContext jaxbContext;
