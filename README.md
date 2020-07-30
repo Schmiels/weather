@@ -5,6 +5,7 @@ Diese Anwendung ruft Daten von der openweathermap-api als JSON ab und gibt die D
 ```
 git clone https://github.com/Schmiels/weather.git
 cd weather
+cd spring-weather-app
 mvn clean install
 ```
 
