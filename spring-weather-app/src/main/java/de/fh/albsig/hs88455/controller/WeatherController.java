@@ -6,6 +6,7 @@ import de.fh.albsig.hs88455.services.WeatherService;
 import javax.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,13 @@ public class WeatherController {
 
   private static Logger logger = LogManager.getLogger(WeatherService.class);
 
+  @Autowired
+  private final WeatherService weatherService;
+
+  public WeatherController(WeatherService weatherService) {
+    this.weatherService = weatherService;
+  }
+
   /**
    * Processing POST from index form.
    *
@@ -40,21 +48,24 @@ public class WeatherController {
   @PostMapping("/weather")
   public String weather(
       @RequestParam(value = "cityId", required = false, defaultValue = "0") final int cityId,
+      @RequestParam(value = "zipCode", required = false, defaultValue = "0") final int zipCode,
       @RequestParam(value = "cityName", required = false, defaultValue = "") final String cityName,
       @RequestParam(value = "lat", required = false, defaultValue = "0") final double lat,
       @RequestParam(value = "lon", required = false, defaultValue = "0") final double lon,
-      @RequestParam(value = "countryCode", required = false,
-          defaultValue = "") final String countryCode) {
-
-    WeatherService weatherService = new WeatherService();
+      @RequestParam(value = "countryCodeForName", required = false,
+          defaultValue = "") final String countryCodeForName,
+      @RequestParam(value = "countryCodeForZIP", required = false,
+          defaultValue = "") final String countryCodeForZip) {
     Weather weather = new Weather();
     try {
       if (cityId != 0) {
         weather = weatherService.getWeatherByCityId(cityId);
-        // weather = weatherService.requestWeatherDataT(cityId);
+      } else if (!cityName.equals("") && !countryCodeForName.equals("")) {
+        weather = weatherService.getWeatherByCityNameAndCountryCode(cityName, countryCodeForName);
+      } else if (zipCode != 0 && !countryCodeForZip.equals("")) {
+        weather = weatherService.getWeatherByZipCode(zipCode, countryCodeForZip);
       } else if (!cityName.equals("")) {
-        weather = weatherService.getWeatherByCityName(cityName, countryCode);
-        // weather = weatherService.requestWeatherDataT(cityName, countryCode);
+        weather = weatherService.getWeatherByCityName(cityName);
       } else if (lat != 0 && lon != 0) {
         weather = weatherService.getWeatherByCoords(lat, lon);
       } else {
@@ -79,10 +90,28 @@ public class WeatherController {
    */
   @RequestMapping("/weather/id/{id}")
   public String getWeatherByCityId(@PathVariable(value = "id", required = true) int cityId) {
-    WeatherService weatherService = new WeatherService();
-
     try {
       Weather weather = weatherService.getWeatherByCityId(cityId);
+      return weather.toXml();
+    } catch (CustomOpenWeatherException e) {
+      logger.error("Failed during processing request with given parameters");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    } catch (JAXBException e) {
+      logger.error("Failed during marshalling the weather object.");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    }
+  }
+
+  /**
+   * REST endpoint for the cityName.
+   *
+   * @param cityName cityName
+   * @return String
+   */
+  @RequestMapping("/weather/name/{name}")
+  public String getWeatherByCityName(@PathVariable(value = "name") String cityName) {
+    try {
+      Weather weather = weatherService.getWeatherByCityName(cityName);
       return weather.toXml();
     } catch (CustomOpenWeatherException e) {
       logger.error("Failed during processing request with given parameters");
@@ -101,12 +130,10 @@ public class WeatherController {
    * @return String
    */
   @RequestMapping("/weather/name/{name}/country/{countryCode}")
-  public String getWeatherByCityName(@PathVariable(value = "name") String cityName,
+  public String getWeatherByCityNameAndCountryCode(@PathVariable(value = "name") String cityName,
       @PathVariable(value = "countryCode") String countryCode) {
-    WeatherService weatherService = new WeatherService();
-
     try {
-      Weather weather = weatherService.getWeatherByCityName(cityName, countryCode);
+      Weather weather = weatherService.getWeatherByCityNameAndCountryCode(cityName, countryCode);
       return weather.toXml();
     } catch (CustomOpenWeatherException e) {
       logger.error("Failed during processing request with given parameters");
@@ -127,8 +154,6 @@ public class WeatherController {
   @RequestMapping("/weather/lat/{lat}/lon/{lon}")
   public String getWeatherByCoords(@PathVariable(value = "lat") double lat,
       @PathVariable(value = "lon") double lon) {
-    WeatherService weatherService = new WeatherService();
-
     try {
       Weather weather = weatherService.getWeatherByCoords(lat, lon);
       return weather.toXml();
@@ -140,4 +165,26 @@ public class WeatherController {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
     }
   }
+
+  /**
+   * REST endpoint for the ZIP code.
+   *
+   * @param zipCode zipCode
+   * @return String
+   */
+  @RequestMapping("/weather/zipcode/{zipCode}/country/{countryCode}")
+  public String getWeatherByZipCode(@PathVariable(value = "zipCode") int zipCode,
+      @PathVariable(value = "countryCode") String countryCode) {
+    try {
+      Weather weather = weatherService.getWeatherByZipCode(zipCode, countryCode);
+      return weather.toXml();
+    } catch (CustomOpenWeatherException e) {
+      logger.error("Failed during processing request with given parameters");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    } catch (JAXBException e) {
+      logger.error("Failed during marshalling the weather object.");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    }
+  }
+
 }
