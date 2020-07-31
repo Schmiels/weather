@@ -7,7 +7,7 @@
 	<Appenders>
 		<!-- File Appender -->
 		<File name="FILE"
-			fileName="./src/main/resources/logs/weatherlog4j.log" append="true">
+			fileName="./target/logs/weatherlog4j.log" append="true">
 			<PatternLayout
 				pattern="%-5p | %d{yyyy-MM-dd HH:mm:ss} | [%t] %C{2} (%F:%L) - %m%n" />
 		</File>
